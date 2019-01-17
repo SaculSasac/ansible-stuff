@@ -1,0 +1,31 @@
+---
+- name: check internet access
+  hosts: all
+  tasks:
+    - name: Check URL
+      uri:
+        url: "{{ item }}"
+        timeout: 5
+        validate_certs: no
+      with_items:
+        - http://redhat.com
+        - https://registry.access.redhat.com
+        - https://registry.redhat.io
+        - http://openshift.io
+        - http://openshift.org
+        - http://openshift.com
+        - http://docker.io
+        - http://docker.com
+        - http://github.com
+        - http://github.io
+        - http://githubapp.com
+        - http://maven.org
+        - http://apache.org
+        - http://npmjs.com
+        - http://rubygems.org
+        - http://cpan.org
+        - http://getcomposer.org
+        - https://raw.githubusercontent.com
+        - http://jboss.org
+        - https://dq1dnt4af4eyy.cloudfront.net/
+        - http://grafana.org
