@@ -1,0 +1,92 @@
+---
+- hosts: bastion nodes
+  remote_user: root
+
+  tasks:
+  - block:
+    - name: "Install openshift prereq software"
+      yum: name={{ item }} state=present
+      with_items:
+         - wget
+         - git
+         - net-tools
+         - bind-utils
+         - iptables-services
+         - bridge-utils
+         - bash-completion
+         - kexec-tools
+         - sos
+         - psacct
+
+    - name: "Install additional useful software"
+      yum: 
+        name: {{ item }}
+        state: present
+      with_items:
+         - gcc
+         - ntp
+         - vim-enhanced
+         - lsof
+         - strace
+         - nc
+         - telnet
+         - screen
+         - tmux
+         - telnet
+         - vim
+         - nfs-utils
+         - libsemanage-python
+
+    - name: "Install openshift-ansible"
+      yum:
+        name: openshift-ansible
+        state: present
+
+    - name: "Upgrade all packages"
+      yum:
+        name: '*'
+        state: latest
+
+    - name: "SELinux configuration"
+      selinux:
+        policy: targeted
+        state: enforcing
+
+    - name: "Set SELinux booleans for Docker and NFS"
+      seboolean: 
+        name: {{ item }}
+        state: yes
+        persistent: yes
+      with_items:
+         - virt_use_nfs
+         - virt_sandbox_use_nfs
+         - virt_sandbox_use_fusefs
+
+- hosts: nodes
+  remote_user: root
+
+  - block:
+    - name: "Install Docker"
+      yum:
+        name: docker
+        state: present
+
+    - name: "Config Docker storage setup file"
+      blockinfile:
+        dest: /etc/sysconfig/docker-storage-setup
+        block: |
+          DEVS=/dev/sdc
+          VG=docker-vg
+      tags:
+        - docker-storage-setup
+
+    - name: "Setup Docker Storage"
+      shell: docker-storage-setup
+      tags:
+        - docker-storage-setup
+
+    - name: "Ensure docker is running"
+      systemd:
+         name: docker
+         enabled: yes
+         state: started
