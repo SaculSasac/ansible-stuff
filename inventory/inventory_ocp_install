@@ -1,0 +1,132 @@
+[OSEv3:children]
+masters
+nodes
+etcd
+nfs
+
+[OSEv3:vars]
+ansible_ssh_user=root
+os_firewall_use_firewalld=True
+openshift_deployment_type=openshift-enterprise
+openshift_node_kubelet_args={'pods-per-core': ['100'], 'max-pods': ['250'],'image-gc-high-threshold': ['90'], 'image-gc-low-threshold': ['80']}
+openshift_clock_enabled=true
+openshift_enable_unsupported_configurations=True
+
+openshift_master_cluster_method=native
+openshift_master_cluster_hostname=ocp-api-int-np.sis.ad.bia.itau
+openshift_master_cluster_public_hostname=ocp-api-np.sis.ad.bia.itau
+openshift_master_api_port=443
+openshift_master_console_port=443
+openshift_master_default_subdomain=apps-np.sis.ad.bia.itau
+
+oreg_auth_user=7152959|openshift
+oreg_auth_password=
+
+openshift_hosted_registry_cert_expire_days=3650
+openshift_ca_cert_expire_days=3650
+openshift_node_cert_expire_days=3650
+openshift_master_cert_expire_days=3650
+etcd_ca_default_days=3650
+
+openshift_master_identity_providers=[{'name': 'LOCAL','login': 'true', 'challenge': 'true','kind': 'HTPasswdPasswordIdentityProvider'}, {'name': 'ITAU','challenge': 'true', 'login': 'true', 'kind':'LDAPPasswordIdentityProvider', 'attributes': {'id': ['cn'], 'email':['mail'], 'name': ['displayName'], 'preferredUsername': ['sAMAccountName']}, 'bindDN': 'CN=SVC_OpenShift_LDAP_R,OU=UNIX,OU=Cuentas de Servicio,DC=pro,DC=edenor', 'bindPassword': '.SRgsF-8<', 'ca': 'Edenor-CA-FullChain.pem', 'insecure': 'flase', 'url': 'ldaps://ldaps.sis.ad.bia.itau:636/OU=UNIX,OU=Cuentas de Servicio,DC=pro,DC=edenor?sAMAccountname'}]
+openshift_master_htpasswd_users={'admin':'$apr1$cF/Jm9ql$sN3Q7aWYsMz.UBWrw8fnW0', 'developer': '$apr1$.GMEWeCs$VskZFqJ/ldF8c0sJe5Ytr.'}
+openshift_master_ldap_ca_file=/root/openshift/certs/ldap-ca.crt
+
+openshift_master_session_name=ssn
+openshift_master_session_max_seconds=3600
+
+
+# Configure SDN cluster network CIDR block. This network block should
+# be a private block and should not conflict with existing network
+# blocks in your infrastructure that pods may require access to.
+# Can not be changed after deployment.
+osm_cluster_network_cidr=10.129.0.0/16
+openshift_master_portal_net=172.31.0.0/16
+
+os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
+
+# Configure number of bits to allocate to each host.s subnet e.g. 8
+# would mean a /24 network on the host.
+osm_host_subnet_length=9
+
+
+
+# REGISTRY
+openshift_hosted_registry_replicas=1
+openshift_hosted_registry_storage_kind=nfs
+openshift_hosted_registry_storage_access_modes=['ReadWriteMany']
+openshift_hosted_registry_storage_nfs_directory=/exports
+openshift_hosted_registry_storage_volume_name=np-registry
+openshift_hosted_registry_storage_volume_size=100Gi
+
+
+# METRICS
+openshift_metrics_install_metrics=true
+openshift_metrics_storage_kind=nfs
+openshift_metrics_storage_access_modes=['ReadWriteOnce']
+openshift_metrics_storage_nfs_directory=/exports
+openshift_metrics_storage_volume_name=np-metrics
+openshift_metrics_storage_volume_size=50Gi
+
+
+# LOGGING
+openshift_logging_install_logging=true
+openshift_logging_kibana_replica_count=2
+openshift_logging_es_cluster_size=3
+openshift_logging_es_nodeselector={"node-role.kubernetes.io/infra":"true"}
+openshift_logging_install_eventrouter=true
+openshift_logging_eventrouter_nodeselector={"node-role.kubernetes.io/infra":"true"}
+openshift_logging_curator_default_days=90
+openshift_logging_curator_run_hour=23
+openshift_logging_curator_run_minute=59
+openshift_logging_curator_run_timezone=America/Argentina/Buenos_Aires
+openshift_logging_curator_nodeselector={"node-role.kubernetes.io/infra":"true"}
+openshift_logging_kibana_nodeselector={"node-role.kubernetes.io/infra":"true"}
+
+
+# MONITORING
+openshift_cluster_monitoring_operator_install=false
+openshift_cluster_monitoring_operator_prometheus_storage_capacity=50Gi
+openshift_cluster_monitoring_operator_alertmanager_storage_capacity=2Gi
+openshift_cluster_monitoring_operator_prometheus_storage_enabled=true
+openshift_cluster_monitoring_operator_alertmanager_storage_enabled=true
+
+
+#SERVICE CATALOG
+openshift_enable_service_catalog=true
+
+
+[bastion]
+ocpbastionpr01.sis.ad.bia.itau ansible_connection=local
+
+[masters]
+ocmstpr01.sis.ad.bia.itau
+ocmstpr02.sis.ad.bia.itau
+ocmstpr03.sis.ad.bia.itau
+
+[etcd]
+ocmstpr01.sis.ad.bia.itau
+ocmstpr02.sis.ad.bia.itau
+ocmstpr03.sis.ad.bia.itau
+
+[infra]
+ocinfpr01.sis.ad.bia.itau
+ocinfpr02.sis.ad.bia.itau
+ocinfpr03.sis.ad.bia.itau
+
+[workers]
+ocwrkpr01.sis.ad.bia.itau
+ocwrkpr02.sis.ad.bia.itau
+
+[nodes]
+ocmstpr01.sis.ad.bia.itau openshift_node_group_name='node-config-master'
+ocmstpr02.sis.ad.bia.itau openshift_node_group_name='node-config-master'
+ocmstpr03.sis.ad.bia.itau openshift_node_group_name='node-config-master'
+ocinfpr01.sis.ad.bia.itau openshift_node_group_name='node-config-infra'
+ocinfpr02.sis.ad.bia.itau openshift_node_group_name='node-config-infra'
+ocinfpr03.sis.ad.bia.itau openshift_node_group_name='node-config-infra'
+ocwrkpr01.sis.ad.bia.itau openshift_node_group_name='node-config-compute'
+ocwrkpr02.sis.ad.bia.itau openshift_node_group_name='node-config-compute'
+
+[nfs]
+ocnfspr01.sis.ad.bia.itau
