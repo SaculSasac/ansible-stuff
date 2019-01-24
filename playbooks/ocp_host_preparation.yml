@@ -4,9 +4,6 @@
 
   tasks:
   - block:
-    tags:
-      - stage1
-
     - name: "Install openshift prereq software"
       yum:
         name: "{{ item }}"
@@ -67,14 +64,15 @@
          - virt_sandbox_use_nfs
          - virt_sandbox_use_fusefs
 
+    tags:
+      - stage1
+
+
 - hosts: nodes
   remote_user: root
 
   tasks:
   - block:
-    tags:
-      - stage2
-
     - name: "Install Docker"
       yum:
         name: docker
@@ -102,3 +100,6 @@
          name: docker
          enabled: yes
          state: started
+
+    tags:
+      - stage2
