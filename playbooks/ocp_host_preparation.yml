@@ -4,8 +4,13 @@
 
   tasks:
   - block:
+    tags:
+      - stage1
+
     - name: "Install openshift prereq software"
-      yum: name={{ item }} state=present
+      yum:
+        name: "{{ item }}"
+        state: present
       with_items:
          - wget
          - git
@@ -20,7 +25,7 @@
 
     - name: "Install additional useful software"
       yum: 
-        name: {{ item }}
+        name: "{{ item }}"
         state: present
       with_items:
          - gcc
@@ -54,7 +59,7 @@
 
     - name: "Set SELinux booleans for Docker and NFS"
       seboolean: 
-        name: {{ item }}
+        name: "{{ item }}"
         state: yes
         persistent: yes
       with_items:
@@ -65,7 +70,11 @@
 - hosts: nodes
   remote_user: root
 
+  tasks:
   - block:
+    tags:
+      - stage2
+
     - name: "Install Docker"
       yum:
         name: docker
