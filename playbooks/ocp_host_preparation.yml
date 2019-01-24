@@ -75,7 +75,7 @@
       copy:
         dest: /etc/sysconfig/docker-storage-setup
         content: |
-          DEVS=/dev/sdc
+          DEVS=/dev/sdb
           VG=docker-vg
           WIPE_SIGNATURES=true
         force: yes
