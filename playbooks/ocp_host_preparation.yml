@@ -71,14 +71,17 @@
         name: docker
         state: present
 
-    - name: "Config Docker storage setup file"
-      blockinfile:
+    - name: "Config Docker storage setup file. Created if don't exist. force: yes to override"
+      copy:
         dest: /etc/sysconfig/docker-storage-setup
-        block: |
+        content: |
           DEVS=/dev/sdc
           VG=docker-vg
+          WIPE_SIGNATURES=true
+        force: yes
       tags:
         - docker-storage-setup
+
 
     - name: "Setup Docker Storage"
       shell: docker-storage-setup
